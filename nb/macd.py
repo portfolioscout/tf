@@ -106,30 +106,29 @@ def doCumsum(dt):
     return dcumsum,res
     
 def doCumsumonSymbols(p):
-    filename,symbols,start,end=p    
+    filename,sym,start,end=p    
     h5 = pd.HDFStore(filename, 'r')           
     fd=pd.DataFrame()
-    for sym in symbols:
-        try:
-            lock.acquire()
-            dt0=getClose(h5,sym)[start:end]
-            lock.release()
+    try:
+        lock.acquire()
+        dt0=getClose(h5,sym)[start:end]
+        lock.release()
 
-            dt = macd(dt0) 
-            dcs,res=doCumsum(dt)
-            res['sym']=sym
-            tfd=pd.DataFrame(res,index=[sym])
-            fd=fd.append(tfd)
-        except: # catch *all* exceptions
-            print "exception with", sym
-            print sys.exc_info()  
+        dt = macd(dt0) 
+        dcs,res=doCumsum(dt)
+        res['sym']=sym
+        tfd=pd.DataFrame(res,index=[sym])
+        fd=fd.append(tfd)
+    except: # catch *all* exceptions
+        print "exception with", sym
+        print sys.exc_info()  
     return fd
     
 def parallelCumsum(filename,syms,start,end,procs=1):
 
     alists=[]
     for i in syms:
-        alists.append((filename,[i],start,end))
+        alists.append((filename,i,start,end))
     #print alists,procs
     pool = mp.Pool(processes=procs)
     res=pool.map(doCumsumonSymbols,alists)
