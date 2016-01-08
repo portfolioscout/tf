@@ -1,4 +1,4 @@
-FROM ubuntu:15.04
+FROM ubuntu
 MAINTAINER portfolioscout
 
 RUN echo "0.1" > /version
