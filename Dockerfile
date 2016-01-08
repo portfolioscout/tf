@@ -10,7 +10,10 @@ VOLUME /home/ruslan/tf
 RUN apt-get update
 RUN apt-get -y install wget
 RUN apt-get -y install bzip2
-RUN apt-get -y intstall libsm6
+RUN apt-get -y install libsm6
+RUN apt-get -y install libglib2.0-0
+RUN apt-get -y install libxext6 
+RUN apt-get -y install libxrender1 
 
 RUN wget https://3230d63b5fc54e62148e-c95ac804525aac4b6dba79b00b39d1d3.ssl.cf1.rackcdn.com/Anaconda2-2.4.1-Linux-x86_64.sh
 RUN bash Anaconda2-2.4.1-Linux-x86_64.sh -b
