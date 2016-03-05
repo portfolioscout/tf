@@ -38,30 +38,30 @@ def getClose(h5,sym):
 
 def fromYahoo(name,sdate='2015-01-01',edate='2015-12-31'):
     
-    DT = web.DataReader(name, data_source='yahoo',
+    dt = web.DataReader(name, data_source='yahoo',
                  start=sdate,end=edate)    
-    return DT
+    return dt
 
-def macd(DT):
+def macd(dt):
     
-    DT['Date'] = pd.to_datetime( DT.index)
-    tempds = DT.sort('Date',ascending = True )
+    dt['Date'] = pd.to_datetime( dt.index)
+    tempds = dt.sort('Date',ascending = True )
     firstDate = tempds['Date'][0]
-    DT['CloseN'] = DT['Adj Close']/DT['Adj Close'][firstDate]
+    dt['CloseN'] = dt['Adj Close']/dt['Adj Close'][firstDate]
     
     cs = tempds['Adj Close']
     firstClose=tempds['Adj Close'][firstDate]
     macd=pd.ewma(cs,span=12)-pd.ewma(cs,span=26)
     signal=pd.ewma(macd,span=9)
     
-    DT['macd'] = macd
-    DT['signal'] = signal
-    DT['dmacd'] = macd-signal
-    DT['market']=np.log(cs/cs.shift(1))
-    return compTrade(DT)
+    dt['macd'] = macd
+    dt['signal'] = signal
+    dt['dmacd'] = macd-signal
+    dt['market']=np.log(cs/cs.shift(1))
+    return compTrade(dt)
 
 
-def plotMacd(DT):
+def plotMacd(dt):
     
 
     figsize=(20, 10)
@@ -70,12 +70,12 @@ def plotMacd(DT):
     fig, axs3 = plt.subplots(1,1,figsize=figsize)
     fig, axs4 = plt.subplots(1,1,figsize=figsize)
             
-    DT['CloseN'].plot(ax=axs1, grid=True)
-    DT['macd'].plot(ax=axs2, grid=True)
-    DT['signal'].plot(ax=axs2, grid=True)
-    DT['dmacd'].plot(ax=axs3, grid=True)
-    DT['reg'].plot(ax=axs3, grid=True)
-    DT[['market','strategy']].cumsum().apply(np.exp).plot(ax=axs4, grid=True)
+    dt['CloseN'].plot(ax=axs1, grid=True)
+    dt['macd'].plot(ax=axs2, grid=True)
+    dt['signal'].plot(ax=axs2, grid=True)
+    dt['dmacd'].plot(ax=axs3, grid=True)
+    dt['reg'].plot(ax=axs3, grid=True)
+    dt[['market','strategy']].cumsum().apply(np.exp).plot(ax=axs4, grid=True)
     
 def doCumsum(dt):
     ntrades=0

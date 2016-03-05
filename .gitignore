@@ -1,4 +1,5 @@
+.idea
 nb/source
 nb/.ipynb_checkpoints
 nb/data
-
+*.pyc
