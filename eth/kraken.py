@@ -1,5 +1,5 @@
 import rest
-import time
+import time,os,codecs
 import logging,datetime
 import pandas as pd
 
@@ -7,6 +7,11 @@ FORMAT = '%(asctime)-15s %(message)s'
 logging.basicConfig(format=FORMAT)
 logger = logging.getLogger('kraken')
 logger.setLevel(logging.DEBUG)
+
+PAIRS=["XETHZUSD"]
+H5FILE="kraken.h5"
+SRCDIR = 'source'
+
 
 
 #print rest.restGET('https://api.kraken.com/0/public/Time')
@@ -23,10 +28,13 @@ logger.setLevel(logging.DEBUG)
 #    array of array entries("time", "open", "high", "low", "close", "vwap", "volume", "count")
 #last = id to be used as since when polling for new, committed OHLC data
 
-def localTimeFromEpoch(epoch):
-    return datetime.datetime.fromtimestamp(epoch).strftime('%Y-%m-%d %H:%M:%S.%f')
+def toUtf8(s):
+    return s.encode('utf-8') if isinstance(s, basestring)   else s
 
-def getOHLC(pair,interval=1440,since=0):
+def localTimeFromEpoch(epoch):
+    return datetime.datetime.fromtimestamp(epoch)
+
+def getOhlc(pair,interval=1440,since=0):
     last = since
     last1 = -1
     totEntr = 0
@@ -59,7 +67,7 @@ def getOHLC(pair,interval=1440,since=0):
                 
             for i in range(0,len(d)):
                 d[i][0]=localTimeFromEpoch(d[i][0])
-                df.loc[i]=d[i]
+                df.loc[i]=[toUtf8(x) for x in d[i]]
 
             time.sleep(1)
         except Exception as e:
@@ -71,8 +79,21 @@ def getOHLC(pair,interval=1440,since=0):
     #remove the last row the data may not be complete
     df.drop(df.index[len(df)-1], inplace=True)
     return df
-            
-            
-df=getOHLC("XETHZUSD",1440,1441148619) 
-print(df)           
+
+def storeHdf5(data, tag, path):
+    with pd.get_store(path) as store:
+        store[tag] = data            
+
+def getKrakenData(interval=1440,since=0):
+    directory = SRCDIR
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    for p in PAIRS:
+        logger.debug('download data for: '+p+' interval: '+str(interval)+' since:'+str(localTimeFromEpoch(since)))
+        pdata = getOhlc(p, interval,since)
+        storeHdf5(pdata,p+'_'+str(interval),directory+'/'+H5FILE)
+
+getKrakenData(1440,1441148619)            
+#df=getOHLC("XETHZUSD",1440,1441148619) 
+#print(df)           
     
