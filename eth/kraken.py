@@ -8,9 +8,13 @@ logging.basicConfig(format=FORMAT)
 logger = logging.getLogger('kraken')
 logger.setLevel(logging.DEBUG)
 
-PAIRS=["XETHZUSD"]
+PAIRS=["XETHZUSD","XXBTZUSD"]
 H5FILE="kraken.h5"
 SRCDIR = 'source'
+# jan 1 2015
+STARTDATE=1420070400
+DAY=1440
+INTERVAL=DAY
 
 
 
@@ -93,7 +97,7 @@ def getKrakenData(interval=1440,since=0):
         pdata = getOhlc(p, interval,since)
         storeHdf5(pdata,p+'_'+str(interval),directory+'/'+H5FILE)
 
-getKrakenData(1440,1441148619)            
+getKrakenData(INTERVAL,STARTDATE)            
 #df=getOHLC("XETHZUSD",1440,1441148619) 
 #print(df)           
     
