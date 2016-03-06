@@ -8,7 +8,7 @@ logging.basicConfig(format=FORMAT)
 logger = logging.getLogger('kraken')
 logger.setLevel(logging.DEBUG)
 
-PAIRS=["XETHZUSD","XXBTZUSD"]
+PAIRS=["XETHZUSD","XXBTZUSD","XLTCZUSD"]
 H5FILE="kraken.h5"
 SRCDIR = 'source'
 # jan 1 2015
