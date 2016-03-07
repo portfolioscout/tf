@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-REGDELTA=0.001
+REGDELTA=0.0001
 #transaction cost is 0.5%
 XCOSTPCT=0.5
 

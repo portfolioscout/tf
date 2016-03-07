@@ -31,15 +31,15 @@ def compute(pair,fr,interval=INTERVAL,foo=macd1.compTradeDmacd):
     strat=np.exp(dcumsum['strategy'][lpos])
     strat_f=np.exp(dcumsum['strategy_fee'][lpos])
     bhold=np.exp(dcumsum['market'][lpos])
-    return (bhold,strat,strat_f,lpos+1)
+    return (df.index[0],df.index[len(df.index)-1],bhold,strat,strat_f,lpos+1)
   
 def computeAll(interval=INTERVAL):
-    df=pd.DataFrame(columns=['pair','from','interval','bhold','strat','strat_f','strat1','strat1_f','nintervals'])
+    df=pd.DataFrame(columns=['pair','from','to','interval','bhold','strat','strat_f','strat1','strat1_f','nintervals'])
     intStr = krakenutl.intervalToStr(interval)
     for p in krakenutl.PAIRS:
-        (bhold,strat,strat_f,nint)=compute(p,FROM,interval,macd1.compTradeDmacd)
-        (bhold1,strat1,strat1_f,nint1)=compute(p,FROM,interval,macd1.compTradeDmacdNoShort)
-        df.loc[len(df)] = [p, FROM, intStr, bhold,strat,strat_f,strat1,strat1_f,nint]
+        (s,e,bhold,strat,strat_f,nint)=compute(p,FROM,interval,macd1.compTradeDmacd)
+        (s,e,bhold1,strat1,strat1_f,nint1)=compute(p,FROM,interval,macd1.compTradeDmacdNoShort)
+        df.loc[len(df)] = [p, s,e, intStr, bhold,strat,strat_f,strat1,strat1_f,nint]
     print(df.to_csv())
 
 
