@@ -2,19 +2,19 @@ import rest
 import time,os,codecs
 import logging,datetime
 import pandas as pd
+import krakenutl
+from pandas import HDFStore,DataFrame
 
 FORMAT = '%(asctime)-15s %(message)s'
 logging.basicConfig(format=FORMAT)
 logger = logging.getLogger('kraken')
 logger.setLevel(logging.DEBUG)
 
-PAIRS=["XETHZUSD","XXBTZUSD","XLTCZUSD"]
-H5FILE="kraken.h5"
-SRCDIR = 'source'
 # jan 1 2015
-STARTDATE=1420070400
-DAY=1440
-INTERVAL=DAY
+#STARTDATE=1420070400
+#1/1/12
+STARTDATE=1325377003
+INTERVAL=krakenutl.DAY
 
 
 
@@ -62,6 +62,7 @@ def getOhlc(pair,interval=1440,since=0):
             last1=last
             last = r["result"]["last"] if "last" in r["result"].keys() else 0
             ent=len(r["result"][pair])
+            logger.debug('ent: '+str(ent))
             totEntr = totEntr+ent
             #pivot data into  multi l=column format
             d=r["result"][pair]
@@ -85,19 +86,35 @@ def getOhlc(pair,interval=1440,since=0):
     return df
 
 def storeHdf5(data, tag, path):
-    with pd.get_store(path) as store:
-        store[tag] = data            
+    hdf = HDFStore(path,'a')
+    if tag in hdf.keys():
+        hdf.append(tag,data)
+    else:
+        hdf.put(tag,data)
+    hdf.close()          
 
 def getKrakenData(interval=1440,since=0):
-    directory = SRCDIR
+    directory = krakenutl.SRCDIR
     if not os.path.exists(directory):
         os.makedirs(directory)
-    for p in PAIRS:
+    for p in krakenutl.PAIRS:
         logger.debug('download data for: '+p+' interval: '+str(interval)+' since:'+str(localTimeFromEpoch(since)))
         pdata = getOhlc(p, interval,since)
-        storeHdf5(pdata,p+'_'+str(interval),directory+'/'+H5FILE)
+        storeHdf5(pdata,krakenutl.getTagFromPair(p,interval),krakenutl.getH5source())
 
-getKrakenData(INTERVAL,STARTDATE)            
-#df=getOHLC("XETHZUSD",1440,1441148619) 
-#print(df)           
+
+if __name__ == '__main__':   
+    getKrakenData(krakenutl.DAY,STARTDATE) 
+    getKrakenData(krakenutl.WEEK,STARTDATE)            
+    getKrakenData(krakenutl.H3,STARTDATE) 
+    getKrakenData(krakenutl.H1,STARTDATE)
+    getKrakenData(krakenutl.M30,STARTDATE) 
+    getKrakenData(krakenutl.M15,STARTDATE)
+    getKrakenData(krakenutl.M5,STARTDATE) 
+    #df=getOhlc("XXBTZUSD",5,1441148619) 
+    #print(df) 
+    hdf = HDFStore(krakenutl.getH5source())
+    for k in hdf.keys():
+        print(k,len(hdf[k]))
+    hdf.close()              
     

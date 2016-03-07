@@ -3,13 +3,21 @@ import pandas as pd
 
 REGDELTA=0.001
 
-def compTrade(dt):
+# classical mean reverting, buy and short
+def compTradeDmacd(dt):
     dt['regime']=np.where(dt['dmacd']>REGDELTA,1,0)
     dt['regime']=np.where(dt['dmacd']<-REGDELTA,-1,dt['regime'])
     dt['strategy']=dt['regime'].shift(1)*dt['market']
     return dt
     
-def compMacd(dt):
+# classical mean reverting, buy but don't short
+def compTradeDmacdNoShort(dt):
+    dt['regime']=np.where(dt['dmacd']>REGDELTA,1,0)
+    dt['regime']=np.where(dt['dmacd']<-REGDELTA,0,dt['regime'])
+    dt['strategy']=dt['regime'].shift(1)*dt['market']
+    return dt
+        
+def compMacd(dt,foo):
     
     tempds = dt.sort_index(ascending = True)
     firstDate = tempds.index[0]
@@ -23,4 +31,7 @@ def compMacd(dt):
     dt['signal'] = signal
     dt['dmacd'] = macd-signal
     dt['market']=np.log(cs/cs.shift(1))
-    return compTrade(dt)    
+    return foo(dt)
+    
+      
+      
