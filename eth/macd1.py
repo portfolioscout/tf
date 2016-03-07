@@ -2,12 +2,15 @@ import numpy as np
 import pandas as pd
 
 REGDELTA=0.001
+#transaction cost is 0.5%
+XCOSTPCT=0.5
 
 # classical mean reverting, buy and short
 def compTradeDmacd(dt):
     dt['regime']=np.where(dt['dmacd']>REGDELTA,1,0)
     dt['regime']=np.where(dt['dmacd']<-REGDELTA,-1,dt['regime'])
     dt['strategy']=dt['regime'].shift(1)*dt['market']
+    dt['strategy_fee']=dt['regime'].shift(1)*dt['market']*(1.0-XCOSTPCT/100.)
     return dt
     
 # classical mean reverting, buy but don't short
@@ -15,6 +18,7 @@ def compTradeDmacdNoShort(dt):
     dt['regime']=np.where(dt['dmacd']>REGDELTA,1,0)
     dt['regime']=np.where(dt['dmacd']<-REGDELTA,0,dt['regime'])
     dt['strategy']=dt['regime'].shift(1)*dt['market']
+    dt['strategy_fee']=dt['regime'].shift(1)*dt['market']*(1.0-XCOSTPCT/100.)
     return dt
         
 def compMacd(dt,foo):
