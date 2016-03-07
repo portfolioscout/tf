@@ -14,7 +14,7 @@ import pandas.io.data as web
 import matplotlib.pyplot as plt
 import multiprocessing as mp
 
-FROM = '2015-01-01 00:00:00.000000'
+FROM = '2012-01-01 00:00:00.000000'
 INTERVAL=krakenutl.DAY
 
 def compute(pair,fr,interval=INTERVAL,foo=macd1.compTradeDmacd):
@@ -39,7 +39,7 @@ def computeAll(interval=INTERVAL):
         (bhold,strat,nint)=compute(p,FROM,interval,macd1.compTradeDmacd)
         (bhold1,strat1,nint1)=compute(p,FROM,interval,macd1.compTradeDmacdNoShort)
         df.loc[len(df)] = [p, FROM, intStr, bhold,strat,strat1,nint]
-    print(df)
+    print(df.to_csv())
 
 
 if __name__ == '__main__':    
