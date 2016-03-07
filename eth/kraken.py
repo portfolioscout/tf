@@ -32,11 +32,6 @@ INTERVAL=krakenutl.DAY
 #    array of array entries("time", "open", "high", "low", "close", "vwap", "volume", "count")
 #last = id to be used as since when polling for new, committed OHLC data
 
-def toUtf8(s):
-    return s.encode('utf-8') if isinstance(s, basestring)   else s
-
-def localTimeFromEpoch(epoch):
-    return datetime.datetime.fromtimestamp(epoch)
 
 def getOhlc(pair,interval=1440,since=0):
     last = since
@@ -71,8 +66,8 @@ def getOhlc(pair,interval=1440,since=0):
                 return None
                 
             for i in range(0,len(d)):
-                d[i][0]=localTimeFromEpoch(d[i][0])
-                df.loc[i]=[toUtf8(x) for x in d[i]]
+                d[i][0]=krakenutl.localTimeFromEpoch(d[i][0])
+                df.loc[i]=[krakenutl.toUtf8(x) for x in d[i]]
 
             time.sleep(1)
         except Exception as e:
@@ -98,7 +93,7 @@ def getKrakenData(interval=1440,since=0):
     if not os.path.exists(directory):
         os.makedirs(directory)
     for p in krakenutl.PAIRS:
-        logger.debug('download data for: '+p+' interval: '+str(interval)+' since:'+str(localTimeFromEpoch(since)))
+        logger.debug('download data for: '+p+' interval: '+str(interval)+' since:'+str(krakenutl.localTimeFromEpoch(since)))
         pdata = getOhlc(p, interval,since)
         storeHdf5(pdata,krakenutl.getTagFromPair(p,interval),krakenutl.getH5source())
 

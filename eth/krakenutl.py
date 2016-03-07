@@ -1,4 +1,5 @@
 
+import time,datetime
 PAIRS=["XETHZUSD","XXBTZUSD","XLTCZUSD"]
 H5FILE="kraken.h5"
 SRCDIR = 'source'
@@ -34,5 +35,14 @@ def intervalToStr(interval):
         raise 'invalid interval'
     else:
         return  intToStr[interval] 
+        
+def toUtf8(s):
+    return s.encode('utf-8') if isinstance(s, basestring)   else s
+
+def localTimeFromEpoch(epoch):
+    return datetime.datetime.fromtimestamp(epoch)  
+    
+def epochFromLocalTime(lt):
+    return int(time.mktime(time.strptime(lt, "%Y-%m-%d %H:%M:%S")))         
 
 
