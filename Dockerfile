@@ -3,7 +3,7 @@ MAINTAINER portfolioscout
 
 RUN echo "0.1" > /version
 
-VOLUME /home/ruslan/tf
+VOLUME /conda 
 
 #ADD anaconda-tf-install.sh /
 #RUN ./anaconda-tf-install.sh
